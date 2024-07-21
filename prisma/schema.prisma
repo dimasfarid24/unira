@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model fakultas {
+  id_fakultas    Int       @id @default(autoincrement())
+  nama_fakultas  String    @db.VarChar(100)
+  prodis         prodi[]
+  contents       content[]
+  galeris        galeri[]
+  testimonis     testimoni[]
+}
+
+model prodi {
+  id_prodi       Int       @id @default(autoincrement())
+  id_fakultas    Int
+  nama_prodi     String    @db.VarChar(100)
+  fakultas       fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+  contents       content[]
+}
+
+model content {
+  id_content        Int       @id @default(autoincrement())
+  id_jenis_content  Int
+  id_fakultas       Int
+  id_prodi          Int
+  judul_content     String    @db.VarChar(200)
+  isi_text          String    @db.LongText
+  gambar_content    String?   @db.Text
+  nis               String    @db.VarChar(20)
+  status            Int       @db.TinyInt
+  dibaca            Int
+  fakultas          fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+  prodi             prodi     @relation(fields: [id_prodi], references: [id_prodi])
+}
+
+model galeri {
+  id_galeri         Int       @id @default(autoincrement())
+  id_fakultas       Int
+  judul_galeri      String    @db.VarChar(200)
+  tanggal_posting   DateTime
+  nis               String    @db.VarChar(10)
+  status            Int       @db.TinyInt
+  fakultas          fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+  detils_galeris    detil_galeri[]
+}
+
+model detil_galeri {
+  id_detil_galeri   Int       @id @default(autoincrement())
+  id_galeri         Int
+  gambar            String
+  keterangan        String
+  galeri            galeri    @relation(fields: [id_galeri], references: [id_galeri])
+}
+
+model testimoni {
+  id_testimoni      Int     @id @default(autoincrement())
+  id_fakultas       Int
+  testimoner        String  @db.VarChar(50)
+  pekerjaan_testimoner  String  @db.VarChar(30)
+  isi_testimoni     String
+  foto_testimone    String
+  tgl_testimone     DateTime
+  fakultas          fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+}
