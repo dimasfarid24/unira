@@ -13,24 +13,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model fakultas {
+model Fakultas {
   id_fakultas    Int       @id @default(autoincrement())
   nama_fakultas  String    @db.VarChar(100)
-  prodis         prodi[]
-  contents       content[]
-  galeris        galeri[]
-  testimonis     testimoni[]
+  prodis         Prodi[]
+  contents       Content[]
+  galeris        Galeri[]
+  testimonis     Testimoni[]
+  headers        Header[]
+  kegiatans      Kegiatan[]
+  kerjasamas     Kerjasama[]
+  kerjasma_bbks  KerjasamaBbk[]
 }
 
-model prodi {
+model Prodi {
   id_prodi       Int       @id @default(autoincrement())
   id_fakultas    Int
   nama_prodi     String    @db.VarChar(100)
-  fakultas       fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
-  contents       content[]
+  fakultas       Fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+  contents       Content[]
+  dokars         Dokar[]
+  kegiatans      Kegiatan[]
 }
 
-model content {
+model Content {
   id_content        Int       @id @default(autoincrement())
   id_jenis_content  Int
   id_fakultas       Int
@@ -41,36 +47,128 @@ model content {
   nis               String    @db.VarChar(20)
   status            Int       @db.TinyInt
   dibaca            Int
-  fakultas          fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
-  prodi             prodi     @relation(fields: [id_prodi], references: [id_prodi])
+  fakultas          Fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+  prodi             Prodi     @relation(fields: [id_prodi], references: [id_prodi])
 }
 
-model galeri {
+model Galeri {
   id_galeri         Int       @id @default(autoincrement())
   id_fakultas       Int
   judul_galeri      String    @db.VarChar(200)
   tanggal_posting   DateTime
   nis               String    @db.VarChar(10)
   status            Int       @db.TinyInt
-  fakultas          fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
-  detils_galeris    detil_galeri[]
+  fakultas          Fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+  detils_galeris    DetilGaleri[]
 }
 
-model detil_galeri {
+model DetilGaleri {
   id_detil_galeri   Int       @id @default(autoincrement())
   id_galeri         Int
-  gambar            String
+  gambar            String?
   keterangan        String
-  galeri            galeri    @relation(fields: [id_galeri], references: [id_galeri])
+  galeri            Galeri    @relation(fields: [id_galeri], references: [id_galeri])
 }
 
-model testimoni {
-  id_testimoni      Int     @id @default(autoincrement())
-  id_fakultas       Int
-  testimoner        String  @db.VarChar(50)
-  pekerjaan_testimoner  String  @db.VarChar(30)
-  isi_testimoni     String
-  foto_testimone    String
-  tgl_testimone     DateTime
-  fakultas          fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+model Testimoni {
+  id_testimoni          Int         @id @default(autoincrement())
+  id_fakultas           Int
+  testimoner            String      @db.VarChar(50)
+  pekerjaan_testimoner  String      @db.VarChar(30)
+  isi_testimoni         String
+  foto_testimoni        String?
+  tgl_testimoni         DateTime
+  fakultas              Fakultas    @relation(fields: [id_fakultas], references: [id_fakultas])
+}
+
+model Header {
+  id_header       Int       @id @default(autoincrement())
+  id_fakultas     Int
+  judul_header    String    @db.VarChar(50)
+  subjudul_header String    @db.VarChar(100)
+  gambar_header   String?
+  fakultas        Fakultas  @relation(fields: [id_fakultas], references: [id_fakultas])
+}
+
+model Unit {
+  id_unit    Int      @id @default(autoincrement())
+  nama_unit  String   @db.VarChar(80)
+  dokars     Dokar[]
+}
+
+model Dokar {
+  nis       String    @db.VarChar(20)
+  id_prodi  Int
+  id_unit   Int       @db.TinyInt
+  nidn      String    @db.VarChar(20)
+  nama      String    @db.VarChar(100)
+  prodi     Prodi     @relation(fields: [id_prodi], references: [id_prodi])
+  unit      Unit      @relation(fields: [id_unit], references: [id_unit])
+
+  @@unique([id_prodi,id_unit])
+}
+
+model Kegiatan {
+  id_kegiatan     Int         @id @default(autoincrement())
+  id_prodi        Int
+  id_fakultas     Int
+  judul_kegiatan  String      @db.VarChar(50)
+  isi_kegiatan    String
+  tanggal_mulai   DateTime
+  tanggal_akhir   DateTime
+  tanggal_posting DateTime    @default(now())
+  lokasi          String      @db.VarChar(200)
+  nis             String      @db.VarChar(10)
+  status          Int         @db.TinyInt
+  prodi           Prodi       @relation(fields: [id_prodi], references: [id_prodi])
+  fakultas        Fakultas    @relation(fields: [id_fakultas], references: [id_fakultas])
+}
+
+model JenisKerjasama {
+  id_jenis_kerjasama    Int             @id @default(autoincrement())
+  nama_jenis_kerjasama  String          @db.VarChar(200)
+  kerjasamas            Kerjasama[]
+  kerjasama_bbks        KerjasamaBbk[]
+}
+
+model WilayahKerjasama {
+  id_wilayah_kerjasama    Int             @id @default(autoincrement())
+  nama_wilayah_kerjasama  String          @db.VarChar(200)
+  kerjasama_bbks          KerjasamaBbk[]
+}
+
+model Kerjasama {
+  id_kerjasama        Int             @id @default(autoincrement())
+  id_jenis_kerjasama  Int
+  id_fakultas         Int
+  judul_kerjasama     String          @db.VarChar(200)
+  isi_kerjasama       String
+  tanggal_posting     DateTime        @default(now())
+  nis                 String          @db.VarChar(10)
+  status              Int             @db.TinyInt
+  gambar_kerjasama    String?
+  fakultas            Fakultas        @relation(fields: [id_fakultas], references: [id_fakultas])
+  jenis_kerjasama     JenisKerjasama  @relation(fields: [id_jenis_kerjasama], references: [id_jenis_kerjasama])
+}
+
+model KerjasamaBbk {
+  id_kerjasama          Int               @id  @default(autoincrement())
+  id_fakultas           Int
+  id_rak                Int
+  id_wilayah_kerjasama  Int
+  id_jenis_kerjasama    Int
+  nis                   String            @db.VarChar(30)
+  judul_kerjasama       String            @db.VarChar(200)
+  isi_kerjasama         String
+  pihak_1               String            @db.VarChar(200)
+  pihak_2               String            @db.VarChar(200)
+  tanggal_kerjasama     DateTime
+  tanggal_kadaluarsa    DateTime
+  file_kerjasama        String?
+  status                Int               @db.TinyInt
+  gambar_kerjasama      String?
+  tanggal_posting       DateTime          @default(now())
+  fakultas              Fakultas          @relation(fields: [id_fakultas], references: [id_fakultas])
+  wilayah_kerjasama     WilayahKerjasama  @relation(fields: [id_wilayah_kerjasama], references: [id_wilayah_kerjasama])
+  jenis_kerjasama       JenisKerjasama    @relation(fields: [id_jenis_kerjasama], references: [id_jenis_kerjasama])
 }
