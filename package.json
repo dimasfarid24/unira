@@ -24,7 +24,10 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"preline": "^2.3.0",
+		"@popperjs/core": "^2.11.8",
+		"@preline/carousel": "^2.4.0",
+		"@preline/dropdown": "^2.4.0",
+		"preline": "^2.4.0",
 		"prisma": "^5.17.0"
 	}
 }
